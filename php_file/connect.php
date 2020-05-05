@@ -8,9 +8,9 @@
  */
 try {
     $dbh = new PDO(
-        "mysql:host=localhost;dbname=culminant", // set name db
-        "phpmyadmin",  // set name user db
-        "labbradoR2!"  // set password user db
+        "mysql:host=localhost;dbname=cs4130_sp2020", // set name db
+        "cs4130_sp2020",  // set name user db
+        "ltempPWD!"  // set password user db
     );
 } catch (Exception $e) {
     die("ERROR: Couldn't connect. {$e->getMessage()}");
