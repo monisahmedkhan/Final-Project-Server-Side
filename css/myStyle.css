@@ -1,0 +1,133 @@
+body{
+	margin:auto auto auto auto;
+	text-align: center;
+	background-color: aliceblue;
+	font-family: Courier New;
+}
+
+h1{ color:#004480; font-size:22px;  }
+h2{ color:#004480; font-size:18px;  }
+.hide{ display: none;  }
+.myBlock{
+	margin: auto auto auto auto;
+	text-align: center;
+	display: block;
+	margin-bottom: 30px;
+	background-color: #28a4aa78;
+	width: 350px;
+	border-radius: 10px;
+}
+
+#block_form{
+	border: 1px solid #5b94dd17;
+	width: 90%;
+}
+
+hr{  width: 90%; color:aliceblue;  }
+
+input[type="button"],i.butt{ 
+		background-color: #309cc6cf;color:white;border-radius: 5px;
+		padding: 3px 8px 3px 8px;font-weight: bold; cursor: pointer;
+		width: 100px; height: 40px; 
+}
+
+input[type="text"]{ border: 1px solid #54add091;padding: 5px;border-radius: 5px;color:black;  }
+.bolder{ font-weight: bold;  }
+textarea{ width:300px; height: 180px;  }
+.box_post{
+    border: 1px solid  azure;
+	width: 96%;
+	margin: 10px auto 10px auto;
+	background-color: #c7d0cc;
+	text-align: left; 
+}
+.box_comment{ 
+		border: 1px solid  azure;
+		width: 96%;
+		margin: 10px auto 10px auto;
+		text-align: left; 
+		background-color: #9cafb5;  
+}
+.box_post p{
+	padding-left: 5px;
+	padding-left: 5px;
+}
+.title_post,.title_comment{
+	padding-top: 4px;
+	background-color: aliceblue;
+	padding-left: 5px;
+	padding-left: 5px;
+}
+
+.footer_post, .footer_comment{
+	padding-top: 4px;
+	font-size: 11px;
+	background-color:aliceblue;
+	height: 16px;
+}
+.whois_post, .whois_comment{
+	padding-top: 4px;
+	font-size: 11px;
+	height: 16px;
+	text-align: right;
+	font-style: italic;
+}
+.delete_post, .delete_comment{
+	float: right;
+	margin-right: 1px;
+	border: 1px solid
+	black;
+	padding: 0 2px 0 2px;
+	position: relative;
+	top: -3px;
+	cursor: pointer;
+}
+.f11{
+	font-size:11px;
+}
+.bordAll{
+	border:1px solid gray;
+}
+.text_left{
+	text-align: left;
+}
+.text_center{
+	text-align: center;
+}
+.block-category{
+	background-color: #6fa7bd;
+	width: 90%;
+	margin:auto;
+	border-radius: 3px;
+	margin-bottom: 10px;
+}
+.block-title1{
+	padding:5px;
+	background-color: #36cc9b;
+}
+
+.block-footer{
+	text-align: right;
+	font-style: italic;
+}
+.bold{
+	font-weight: bold;
+}
+.padd5{
+	padding:5px;
+}
+.pLeft10{
+	padding-left: 10px;
+}
+.pRight10{
+	padding-right: 10px;
+}
+.tRight{ text-align: right;  }
+.float_left{ float:left;  }
+.float_right{  float:right; }
+.pointer{ cursor: pointer;  }
+.w100{ width:100%;  }
+.w98{ width:98%;  }
+.red{ color:red;  }
+.bg-red{ background-color:red;  }
+
