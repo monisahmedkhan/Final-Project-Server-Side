@@ -1,5 +1,5 @@
 <?php
- 	header('Content-Type: application/json'); 
+     header('Content-Type: application/json'); 
 	ob_start(); session_start(); ob_end_flush();
 
      class do_register{
@@ -15,10 +15,10 @@
      		include "connect.php";
      		if( $this->v["password"] == $this->v["password2"] ){
       			if( !user_page::get_username($dbh, $this->v["username"] ) ){
-                          if( user_page::save_data($dbh, $this->v["username"], $this->v["password"]) ){
-                               user_page::last_insert($dbh);
+                          if( user_page::save_data_user($dbh, $this->v) ){
+                              $uid= user_page::lastID($dbh);
           				if( !$this->error ){
-          						$this->v_user_data = user_page::get_data($dbh, $this->v["username"]);    
+          						$this->v_user_data = user_page::get_data($dbh, $uid);    
           				}
           			}else $this->error=true;	
      		     }else
@@ -30,7 +30,7 @@
      		if( !$this->error ){
                          
                     $v_return["check"] = true;
-     			$v_return["text"] = user_page::print_confirm_registration();
+     			$v_return["text"] = html_file::print_confirm_registration();
      		}
      		else
      			$v_return["check"] = false;	
@@ -42,6 +42,7 @@
      } 
 
      require('user_page.php');
+     require('../html_file/html_file.php');
      $safePost = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
      $do = new do_register($safePost);

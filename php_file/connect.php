@@ -8,10 +8,11 @@
  */
 try {
     $dbh = new PDO(
-        "mysql:host=localhost;dbname=cs4130_sp2020", // set name db
-        "cs4130_sp2020",  // set name user db
-        "ltempPWD!"  // set password user db
+        "mysql:host=localhost;dbname=pizza", // set name db -->insert tge
+        "root",  // set name user db
+        ""  // set password user dbth
     );
 } catch (Exception $e) {
     die("ERROR: Couldn't connect. {$e->getMessage()}");
 }
+    

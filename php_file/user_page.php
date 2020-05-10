@@ -11,66 +11,26 @@
                return $password_enctrypted;
         }
 
-     	public static function  save_data($dbh, $username, $password){
-            $password_enctrypted = user_page::encrypt_password( $password );     
-     	    $command = "INSERT INTO `users`(  `username`, `password`) VALUES (  ?, ? )";
-
-			$stmt = $dbh->prepare($command);
-			$params = [ $username, $password_enctrypted ];
-			$success = $stmt->execute( $params );
-
-			if( $success ) 
-     			return true;
-     		return false;
-     	}
-
-     	public static function get_username($dbh, $username ){
-              $command = "SELECT * FROM `users` WHERE `username`= ? ";
-              $stmt = $dbh->prepare($command);
-              $params = [ $username ];
-              $success = $stmt->execute($params);
-
-              while ( $user_data = $stmt->fetch()  ) {
-                   return true;
-               }
-               return false;
-        }
-
-        public static function last_insert($dbh){
-		 	return $dbh->lastInsertId();
-		}
-
-     	public static function get_data($dbh, $username){
-     		$command = "SELECT * FROM `users` WHERE username= ? ";
-	
-		    $stmt = $dbh->prepare($command);
-		    $params = [ $username ];
-		    $success = $stmt->execute($params);
-
-		    while ( $user_data = $stmt->fetch()  ) {
-			    return $user_data;
-			}
-			return false;
-     	}
-
-     	public static function get_single_item($id){
+     	public static function sel_width(){
      		$v = false; $i=0;
      		include "connect.php";
-     		$command = "SELECT * FROM `StockUpdates` WHERE StockId = ?";
-			$stmt = $dbh->prepare( $id );
-		    $params = [ $id ];
-		    $success = $stmt->execute($params);
-		    while ( $row = $stmt->fetch()  ) {
-			    $v = $row;
+			
+     		$command = "SELECT * FROM `width_pizza` ORDER BY id";
+			$stmt = $dbh->prepare( $command ); 
+		    $success = $stmt->execute( );
+
+		    while ( $row = $stmt->fetch()) {
+			    $v[$i] = $row;
+			    $i++;
 			}
 			return $v;
      	}
 
-     	public static function get_items(){
+     	public static function sel_ingredients(){
      		$v = false; $i=0;
      		include "connect.php";
 			
-     		$command = "SELECT * FROM `StockUpdates` ORDER by `UpdateDateTime` DESC LIMIT 10;";
+     		$command = "SELECT * FROM `ingredients` ORDER BY name";
 			$stmt = $dbh->prepare( $command ); 
 		    $success = $stmt->execute( );
 
@@ -81,7 +41,269 @@
 			return $v;
      	}
 
-     	public static function check_data($dbh, $username, $password){
+     	public static function sel_ingredient_price($ing, $dbh){
+     				
+     		$command = "SELECT * FROM `ingredients` WHERE id=?";
+			$stmt = $dbh->prepare( $command ); 
+		    
+			$params = [ $ing ];
+			$success = $stmt->execute( $params );
+
+		    while ( $row = $stmt->fetch()  ) {
+			    return (float)$row["price"]; 
+			}
+			return 0;
+     	}
+
+     	public static function calculate_price( $v, $dbh){
+     		$total=0;
+     		for($i=0;$i<count($v);$i++){
+     				$total+= user_page::sel_ingredient_price($v[$i], $dbh);
+     		}
+     		return $total;
+     	}
+
+     	public static function sel_price_width( $width, $dbh){
+     		$command = "SELECT * FROM `width_pizza` WHERE id=?";
+			$stmt = $dbh->prepare( $command ); 
+			$params = [ $width ];
+			$success = $stmt->execute( $params );
+		    while ( $row = $stmt->fetch()  ) {
+			    return (float)$row["price"]; 
+			}
+     		return 0;
+     	}
+
+     	public static function get_name_width( $width, $dbh){
+     		$command = "SELECT * FROM `width_pizza` WHERE id=?";
+			$stmt = $dbh->prepare( $command ); 
+			$params = [ $width ];
+			$success = $stmt->execute( $params );
+		    while ( $row = $stmt->fetch()  ) {
+			    return $row["width"]; 
+			}
+     		return 0;
+     	}
+
+     	public static function get_waiting( $dbh ){
+     		$command = "SELECT max(`waiting_time`) as max_time FROM `pizza` ";
+			$stmt = $dbh->prepare( $command ); 
+			$success = $stmt->execute();
+
+		    while ( $row = $stmt->fetch()  ) {
+			    return (int)$row["max_time"]; 
+			}
+     		return 0;	
+     	}
+
+		public static function save_order( $width, $price, $waiting_time, $user, $hour_submitted, $dbh){     
+     	    $command = "INSERT INTO `pizza`( `width`, `price`, `waiting_time`,`user`, `hour_submitted` ) VALUES ( ? , ? , ?, ?, ?   )";
+		
+			$stmt = $dbh->prepare($command);
+			$params = [ $width, $price, $waiting_time, $user, $hour_submitted ];
+			$success = $stmt->execute( $params );
+			if( $success ) 
+     				return true;
+     		return false;
+		}
+
+		public static function add_user( $name, $address, $city, $dbh ){
+			$command="INSERT INTO `users`( `name`, `address`, `city`) VALUES ( ?,?,?)";
+			$stmt = $dbh->prepare($command);
+			$params = [ $name, $address, $city ];
+			$success = $stmt->execute( $params );
+			if( $success ) 
+     				return true;
+     		return false;
+		}
+
+		public static function add_ingredient( $pizza, $ingredient, $dbh ){
+			$command="INSERT INTO `pizza_ingredients`(`pizza`, `ingredient`) VALUES ( ?, ? )";
+			$stmt = $dbh->prepare($command);
+			$params = [ $pizza, $ingredient ];
+			$success = $stmt->execute( $params );
+			if( $success ) 
+     				return true;
+     		return false;
+		}
+
+		public static function get_name_ingredient( $ingredient, $dbh){
+			$command = "SELECT * FROM `ingredients` WHERE id=?";
+			$stmt = $dbh->prepare( $command ); 
+		    
+			$params = [ $ingredient ];
+			$success = $stmt->execute( $params );
+
+		    while ( $row = $stmt->fetch()  ) {
+			    return $row["name"]; 
+			}
+			return 0;
+		}
+
+		public static function lastID($db){
+			return $db->lastInsertId(); 
+		}
+
+		public static function sel_pizzas($dbh){
+			$v=false; $i=0;
+			$command = "SELECT p.id, name,address, city, w.width, p.price, waiting_time, hour_delivered, hour_cooked, hour_submitted FROM `users` u JOIN `pizza` p ON (p.user=u.id) JOIN `width_pizza` w ON (p.width=w.id) ORDER BY waiting_time DESC ";
+			$stmt = $dbh->prepare( $command ); 
+			$success = $stmt->execute();
+
+		    while ( $row = $stmt->fetch()  ) {
+			    $v[$i]=$row; $i++;
+			}
+     		return $v;	
+		}
+
+		public static function sel_pizza_ingredient($pizza, $dbh){
+			$v=false; $i=0;
+			$command = "SELECT i.name as name FROM `ingredients` i JOIN `pizza_ingredients` p ON (i.id=p.ingredient) where pizza=?";
+			$stmt = $dbh->prepare( $command ); 
+			$params = [ $pizza ];
+			$success = $stmt->execute( $params );
+
+		    while ( $row = $stmt->fetch()  ) {
+			    $v[$i]=$row["name"]; $i++;
+			}
+     		return $v;	
+		}
+
+		public static function set_cooked($dbh, $id){
+			$now=date("H:i:s");
+			$command = "UPDATE `pizza` SET `hour_cooked`=? WHERE `id`=?";
+		
+			$stmt = $dbh->prepare($command);
+			$params = [ $now, $id ];
+			$success = $stmt->execute( $params );
+			if( $success ) 
+     				return true;
+     		return false;	
+		}
+
+		public static function set_delivered($dbh, $id){
+			$now=date("H:i:s");
+			$command = "UPDATE `pizza` SET `hour_delivered`=? WHERE `id`=?";
+		
+			$stmt = $dbh->prepare($command);
+			$params = [ $now, $id ];
+			$success = $stmt->execute( $params );
+			if( $success ) 
+     				return true;
+     		return false;	
+		}
+
+		public static function total_sales($dbh){
+			$command = "SELECT count(*) AS total FROM `pizza`";
+			$stmt = $dbh->prepare( $command ); 
+			$success = $stmt->execute();
+
+		    while ( $row = $stmt->fetch()  ) {
+			    return $row["total"];
+			}
+     		return 0;		
+		}
+
+		public static function total_sales_type( $dbh, $type ){
+			$command = "SELECT count(*) AS total FROM `pizza` WHERE width IN (SELECT id FROM width_pizza WHERE width=? )";
+			$stmt = $dbh->prepare( $command ); 
+			$params = [ $type ];
+			$success = $stmt->execute($params);
+
+		    while ( $row = $stmt->fetch()  ) {
+			    return $row["total"];
+			}
+     		return 0;		
+		}
+
+		public static function total_ingredients($dbh){
+			$v=false; $i=0;	
+			$command = "SELECT count(*) AS total, ingredient, name FROM `pizza_ingredients` JOIN ingredients ON (ingredient=id) GROUP BY ingredient ORDER BY total DESC ";
+			$stmt = $dbh->prepare( $command );
+			$success = $stmt->execute();
+
+		    while ( $row = $stmt->fetch()  ) {
+			    $v[$i] = $row;
+			    $i++;
+			}
+     		return $v;	
+		}
+
+		public static function not_cooked( $dbh ){
+			$command = "SELECT count(*) total FROM `pizza` WHERE hour_cooked is null;";
+			$stmt = $dbh->prepare( $command ); 
+			$success = $stmt->execute();
+
+		    while ( $row = $stmt->fetch()  ) {
+			    return $row["total"];
+			}
+     		return 0;		
+		}
+
+		public static function not_delivered( $dbh ){
+			$command = "SELECT count(*) total FROM `pizza` WHERE hour_delivered is null;";
+			$stmt = $dbh->prepare( $command ); 
+			$success = $stmt->execute();
+
+		    while ( $row = $stmt->fetch()  ) {
+			    return $row["total"];
+			}
+     		return 0;		
+		}
+
+		public static function get_pizza_hour($dbh,$hour_min,$hour_max){
+			$command = "SELECT COUNT(*) total FROM `pizza` WHERE `hour_submitted`>=? AND `hour_submitted`<=?;";
+			$stmt = $dbh->prepare( $command ); 
+			$params = [ $hour_min, $hour_max ];
+			$success = $stmt->execute($params);
+
+		    while ( $row = $stmt->fetch()  ) {
+			    return $row["total"];
+			}
+     		return 0;	
+		}
+		
+		public static function sel_pizzas_completed($dbh){
+			$v=false; $i=0;
+			$command = "SELECT * FROM pizza WHERE hour_delivered IS NOT NULL";
+			$stmt = $dbh->prepare( $command ); 
+			$success = $stmt->execute();
+
+		    while ( $row = $stmt->fetch()  ) {
+			    $v[$i]=$row; $i++;
+			}
+     		return $v;	
+		}
+
+		public static function get_differences_time( $firstTime, $lastTime ){
+			$firstTime=strtotime($firstTime);
+			$lastTime=strtotime($lastTime);
+    		$timeDiff=$lastTime-$firstTime;
+    		if($timeDiff<0)
+    			$timeDiff = $timeDiff*(-1);
+			return $timeDiff;
+		}
+
+		public static function calculate_time_order($dbh,$v){
+			$time = false;
+			for($i=0;$v && $i<count($v);$i++){
+				$time[$i] = user_page::get_differences_time( $v[$i]["hour_submitted"], $v[$i]["hour_delivered"] );
+			}
+			return $time;
+		}
+
+		public static function save_data_user($dbh, $v){
+			$password_enctrypted = user_page::encrypt_password( $v["password"] );     
+			$command="INSERT INTO `users`( `name`, `address`, `city`, `username`, `password`) VALUES (?, ?, ?, ?, ?)";
+			$stmt = $dbh->prepare($command);
+			$params = [ $v["name"], $v["address"], $v["city"], $v["username"], $password_enctrypted  ];
+			$success = $stmt->execute( $params );
+			if( $success ) 
+     				return true;
+     		return false;
+		}
+
+		public static function check_data($dbh, $username, $password){
      		$command = "SELECT * FROM users WHERE username=?";
  
 			$stmt = $dbh->prepare($command);
@@ -89,139 +311,54 @@
 			$success = $stmt->execute( $params );
 			$i=0;
 
-		    while ( $shop = $stmt->fetch()  ) {
-			    if( password_verify($password, $shop["password"] ) ){   
-			    	return $shop["username"]; 
+		    while ( $row = $stmt->fetch()  ) {
+			    if( password_verify($password, $row["password"] ) ){   
+			    	return $row["id"]; 
 				}
 			}
 			return false;
 		}
 
-		public static function save_item( $stockname, $currentprice, $dbh){     
-     	    $command = "INSERT INTO `StockUpdates`(`stockname`,`currentprice`,`updatedatetime`) VALUES (?, ?, NOW() )";
-		
+		public static function check_admin($dbh, $id){
+     		$command = "SELECT * FROM users WHERE id=? AND admin=true";
+ 
 			$stmt = $dbh->prepare($command);
-			$params = [ $stockname, $currentprice ];
+			$params = [ $id ];
 			$success = $stmt->execute( $params );
-			if( $success ) 
-     				return true;
-     		return false;
+
+		    while ( $row = $stmt->fetch()  ) {
+			    return true;
+			}
+			return false;
 		}
 
-     	public static function menu_user(){
-     		$html="<p>
-						<a href='index.php'><input type='button' value='Home' /></a>
-						<input type='button' class='f11' id='add_item' name='add_item' value='Add Item' />
-						<a href='index.php'><input type='button' id='view_items' name='view_items' value='Items' /></a>
-					</p>
-					<p>";
-			    $html.="
-						";
-		        $html.="<input type='button' id='ten_item' name='ten_item' value='10 item' />
-						<input type='button' id='logout' name='logout' value='Logout' />
-					</p>";
-     		return $html;
-     	}
+		public static function get_username($dbh, $username){
+     		$command = "SELECT * FROM users WHERE username=?";
+ 
+			$stmt = $dbh->prepare($command);
+			$params = [ $username ];
+			$success = $stmt->execute( $params );
+ 
+		    while ( $vett = $stmt->fetch()  ) {
+		    	return true;
+			}
+			return false;
+		}
 
-     	public static function print_error(){
-     		return "<p>Error the data are wrong</p>";
-     	}
+		public static function get_data($dbh, $uid){
+     		$command = "SELECT * FROM users WHERE id=?";
+ 
+			$stmt = $dbh->prepare($command);
+			$params = [ $uid ];
+			$success = $stmt->execute( $params );
+ 
+		    while ( $vett = $stmt->fetch()  ) {
+		    	return $vett;
+			}
+			return false;
+		}
+		
 
-     	public static function print_confirm_registration(){
-     		return " <h2>Registration confirmed</h2> 
-					 <form>
-						<p>Log-in</p>
-						<p> <input type='text' placeholder='Insert Username' id='user' name='user' /> </p>
-						<p> <input type='password' placeholder='Insert Password'  id='password' name='password' /> </p>
-						<p> <input type='button' id='login' name='login' value='Login' /> </p>
-				   </form>";
-     	}	
-
-     	public static function print_login(){
-     		return "<form>
-						<p>Log-in</p>
-						<p> <input type='text' placeholder='Insert Username' id='user' name='user' /> </p>
-						<p> <input type='password' placeholder='Insert Password'  id='password' name='password' /> </p>
-						<p> <input type='button' id='login' name='login' value='Login' /> </p>
-						<p>You are not registered? Do it now!!! <input type='button' id='change_register' name='change_register' value='Register' /> </p>
-				   </form>";
-     	}
-
-
-     	// print last 10 data in stock
-     	public static function print_items( $v ){
-     			$html=user_page::menu_user();
-				if($v){
-					for( $i=0;$i<count($v);$i++ ){
-						$html.="<div class='box_post' >
-								  <div class='title_post' >
-								  	<span class='bolder'> ".$v[$i]["stockname"]."</span>
-								  	<input type='hidden'  value=".$v[$i]["stockid"]." /> 
-							  	     
-							  	  </div>
-								  <p> ".$v[$i]["currentprice"]."</p>								 
-								  
-								  <div class='whois_post pRight10'>
-								  	<span></span>
-								  </div>
-							   	  
-							   	  <div class='footer_post' >
-							   	  		<span class='float_left pLeft10' > ".$v[$i]["updatedatetime"]."  </span>
-							   	  </div>	
-							   </div>";
-					}
-				}else $html.="<p id='list_item' >No Items!!!</p>";
-				return $html;
-     	}
-
-     	public static function print_data( $v ){
-     			$my_html = user_page::menu_user();
-     			$my_html.="
-						<hr/>
-						<p> 
-							<p> <span class='bolder'>Username:</span> ".$v["username"]."</p>
-						</p>";
-				return $my_html;
-     	}
-
-     	public static function print_form_update($v){
-     			$html = user_page::menu_user();
-     			$html.= "<hr/>
-						<form id='update_form' >
-							<p>
-								<p> <span class='bolder'>Username:</span> <br/>
-									<input type='text' id='username' name='username' value='".$v["username"]."' /></p>
-								<p> 
-									<input type='button' id='do_update' name='do_update' value='Save' />
-									
-								</p>
-							</p>
-						</form>";
-				return $html;
-     	}
-
-     	public static function print_form_add_item(){
-     			$html = user_page::menu_user();
-     			$html.= "<form id='add_item_form' > 
-							<p> 
-								<p> 
-									<span class='bolder'>Stockname:</span> <br/> 
-									<input type='text' id='stockname' name='stockname' /> 
-								</p> 
-								<p>  
-									<span class='bolder'>Current price:</span> <br/> 
-									<input type='text' id='currentprice' name='currentprice' /> 
-								</p> 
-								<p>  
-									<input type='button' id='save_new_item' name='save_new_item' value='Save' /> 
-									<a href='index.php'>
-										<input type='button' id='undo_item' name='undo_item' value='Undo' /> 
-									</a>
-								</p> 
-							</p>
-					   </form>";
-				return $html;
-     	}
 
      }
 

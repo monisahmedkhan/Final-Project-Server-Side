@@ -25,7 +25,7 @@ h2{ color:#004480; font-size:18px;  }
 
 hr{  width: 90%; color:aliceblue;  }
 
-input[type="button"],i.butt{ 
+input[type="button"],input[type="reset"],i.butt{ 
 		background-color: #309cc6cf;color:white;border-radius: 5px;
 		padding: 3px 8px 3px 8px;font-weight: bold; cursor: pointer;
 		width: 100px; height: 40px; 
@@ -122,6 +122,10 @@ textarea{ width:300px; height: 180px;  }
 .pRight10{
 	padding-right: 10px;
 }
+
+.mTop10{
+	margin-top: 10px;
+}
 .tRight{ text-align: right;  }
 .float_left{ float:left;  }
 .float_right{  float:right; }
@@ -130,4 +134,5 @@ textarea{ width:300px; height: 180px;  }
 .w98{ width:98%;  }
 .red{ color:red;  }
 .bg-red{ background-color:red;  }
-
+ul{  list-style-type: none; }
+.margin_auto{  margin:auto; }
